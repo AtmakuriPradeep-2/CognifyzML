@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -8,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Config
 st.set_page_config(page_title="Restaurant Recommender", page_icon="🍽️")
 
-MODEL_DIR = r"D:\CognifyzML\task2(1)"
+MODEL_DIR = r"D:\CognifyzML\task2"
 
 def cuisine_tokenizer(text):
     return text.split(", ")
@@ -87,8 +88,8 @@ if st.button("Recommend"):
                 "price range, and minimum rating. Similarity score shows how closely a restaurant "
                 "matches your preferences (1.0 = perfect match)."
             )
-
 if st.button("Reset"):
-    st.experimental_rerun()
+    st.rerun()
+
 
 st.markdown("<br><small>🔍 Powered by TF-IDF + PCA + KMeans clustering</small>", unsafe_allow_html=True)
