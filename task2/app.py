@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Config
 st.set_page_config(page_title="Restaurant Recommender", page_icon="🍽️")
 
-MODEL_DIR = r"D:\CognifyzML\task2"
+MODEL_DIR = "task2"
 
 def cuisine_tokenizer(text):
     return text.split(", ")
