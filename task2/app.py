@@ -1,18 +1,19 @@
-
 import streamlit as st
+import os
 import pandas as pd
 import numpy as np
 import joblib
-import os
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Config
 st.set_page_config(page_title="Restaurant Recommender", page_icon="🍽️")
 
-MODEL_DIR = "task2"
+# Use current script directory as base dir, because your models are in the same folder as app.py
+MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def cuisine_tokenizer(text):
-    return text.split(", ")
+# For debugging on Streamlit Cloud or locally, show where it's looking for models and which files exist
+st.caption(f"📂 MODEL_DIR = {MODEL_DIR}")
+st.caption(f"🗂  Files = {os.listdir(MODEL_DIR)}")
 
 @st.cache_resource
 def load_models():
@@ -36,7 +37,7 @@ def get_user_vector(user_cuisines, user_price, user_rating):
     user_cuisines_str = ", ".join(user_cuisines).lower()
     user_cuisine_vec = vectorizer.transform([user_cuisines_str])
     user_cuisine_red = pca.transform(user_cuisine_vec.toarray())
-    user_numeric = scaler.transform([[user_price, user_price, user_rating, 100]])  # Votes as avg
+    user_numeric = scaler.transform([[user_price, user_price, user_rating, 100]])  # Votes set as avg 100
     return np.hstack([user_cuisine_red, user_numeric])
 
 def recommend(user_cuisines, user_price, user_rating, top_n=5):
@@ -47,7 +48,6 @@ def recommend(user_cuisines, user_price, user_rating, top_n=5):
     similarities = cosine_similarity(user_vector, cluster_features).flatten()
     top_idx = similarities.argsort()[::-1][:top_n]
     recommendations = df.iloc[cluster_indices[top_idx]][['Restaurant Name', 'Cuisines', 'Aggregate rating', 'Price range']]
-    # Add similarity scores
     recommendations = recommendations.copy()
     recommendations['Similarity'] = similarities[top_idx]
     return recommendations
@@ -88,8 +88,8 @@ if st.button("Recommend"):
                 "price range, and minimum rating. Similarity score shows how closely a restaurant "
                 "matches your preferences (1.0 = perfect match)."
             )
-if st.button("Reset"):
-    st.rerun()
 
+if st.button("Reset"):
+    st.experimental_rerun()  # works in recent Streamlit versions
 
 st.markdown("<br><small>🔍 Powered by TF-IDF + PCA + KMeans clustering</small>", unsafe_allow_html=True)
